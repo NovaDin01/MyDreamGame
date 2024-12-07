@@ -12,6 +12,7 @@ public class EnemyHolder : MonoBehaviour, IDamageable
     private float currentEnemyHealth;
     [SerializeField] private Transform pointAttack;
     [SerializeField] private LayerMask playerMask;
+    [SerializeField] private float attackRadius;
     private Rigidbody _rb;
 
     private Experience _exp;
@@ -28,39 +29,35 @@ public class EnemyHolder : MonoBehaviour, IDamageable
     {
         if (!_isAttacking) // Проверяем, не идёт ли уже атака
         {
-            Attack();
+            StartCoroutine(EnemyAttack());
         }
     }
 
     private void Die()
     {
-        Debug.Log($"{gameObject.name} погиб от рук");
+        Debug.Log($"{gameObject.name} погиб от рук врага:)");
         Destroy(gameObject);
         _exp.GetXP(50); // Передаём опыт игроку
     }
 
-    private void Attack()
-    {
-        StartCoroutine(EnemyAttack());
-    }
-
     private IEnumerator EnemyAttack()
     {
-        _isAttacking = true; // Устанавливаем флаг начала атаки
+        _isAttacking = true;
 
-        Collider[] hitPlayers = Physics.OverlapSphere(pointAttack.position, 2f, playerMask);
-        foreach (Collider player in hitPlayers)
+        Collider[] hitPlayers = Physics.OverlapSphere(pointAttack.position, attackRadius, playerMask);
+        foreach (Collider target in hitPlayers)
         {
-            if (player.TryGetComponent(out IDamageable damageable))
+            if (target.TryGetComponent(out IDamageable damageable))
             {
                 damageable.TakeDamage(enemyDamage);
-                Debug.Log($"{player.gameObject.name} получил урон");
+                Debug.Log($"{target.gameObject.name} получил {enemyDamage} урона.");
             }
         }
 
-        yield return new WaitForSeconds(enemySpeedOfAttack); // Ожидание перед следующей атакой
-        _isAttacking = false; // Сбрасываем флаг
+        yield return new WaitForSeconds(enemySpeedOfAttack);
+        _isAttacking = false;
     }
+
 
     public void TakeDamage(float damage)
     {
@@ -78,7 +75,7 @@ public class EnemyHolder : MonoBehaviour, IDamageable
         if (pointAttack != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(pointAttack.position, 2f); // Визуализация радиуса атаки
+            Gizmos.DrawWireSphere(pointAttack.position, attackRadius); // Визуализация радиуса атаки
         }
     }
 }

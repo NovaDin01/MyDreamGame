@@ -21,7 +21,7 @@ public class EnemyWaveManager : MonoBehaviour
     private void Start()
     {   
         waveNumber = 1;
-        enemyCount = 5;
+        enemyCount = 2;
         currentWaveTime = 0;
     }
 
@@ -51,7 +51,7 @@ public class EnemyWaveManager : MonoBehaviour
     {
         for (int i = 0; i < enemyCount; i++)
         {
-            yield return new WaitForSeconds(Random.Range(2, 5)); // Задержка между спавнами
+            yield return new WaitForSeconds(Random.Range(1, 3)); // Задержка между спавнами
             enemyTypeIndex = Random.Range(0, enemies.Length);
             spawnPointsIndex = Random.Range(0, spawnPoints.Count);
             Instantiate(enemies[enemyTypeIndex], spawnPoints[spawnPointsIndex].transform.position, Quaternion.identity);
